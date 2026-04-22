@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { isAdminEmail } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
-import { Terminal, Plus, Edit2, Trash2, Eye, EyeOff, LogOut } from "lucide-react"
+import { Terminal, Plus, Edit2, Eye, EyeOff, UserRound, FolderKanban, GraduationCap, Share2, FileText } from "lucide-react"
 import { DeletePostButton, LogoutButton } from "./admin-actions"
 
 export default async function AdminPage() {
@@ -12,11 +13,19 @@ export default async function AdminPage() {
   if (!user) {
     redirect("/auth/login")
   }
-  
-  const { data: posts } = await supabase
-    .from("blog_posts")
-    .select("*")
-    .order("created_at", { ascending: false })
+
+  if (!isAdminEmail(user.email)) {
+    redirect("/auth/login?error=unauthorized")
+  }
+
+  const [{ data: posts }, { data: projects }, { data: education }, { data: socialLinks }, { data: profile }] =
+    await Promise.all([
+      supabase.from("blog_posts").select("*").order("created_at", { ascending: false }),
+      supabase.from("projects").select("id"),
+      supabase.from("education").select("id"),
+      supabase.from("social_links").select("id"),
+      supabase.from("profile").select("id, resume_url").limit(1),
+    ])
   
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -70,6 +79,96 @@ export default async function AdminPage() {
             <Plus className="h-5 w-5" />
             <span className="font-mono">New Post</span>
           </Link>
+        </div>
+
+        <div className="mb-8">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h2 className="font-mono font-bold text-lg">Portfolio Content</h2>
+            <span className="text-xs text-muted-foreground font-mono">
+              Edit the homepage sections from here
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+            <Link
+              href="/admin/profile"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <UserRound className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">
+                  {profile?.length ? "Configured" : "Empty"}
+                </span>
+              </div>
+              <div className="text-lg font-bold mb-1">Profile</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Name, title, bio, and contact email.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+
+            <Link
+              href="/admin/resume"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <FileText className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">
+                  {profile?.[0]?.resume_url ? "Uploaded" : "Missing"}
+                </span>
+              </div>
+              <div className="text-lg font-bold mb-1">Resume</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Upload and replace your PDF resume.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+
+            <Link
+              href="/admin/projects"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <FolderKanban className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">{projects?.length || 0} items</span>
+              </div>
+              <div className="text-lg font-bold mb-1">Projects</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Portfolio cards, links, technologies, featured state.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+
+            <Link
+              href="/admin/education"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <GraduationCap className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">{education?.length || 0} items</span>
+              </div>
+              <div className="text-lg font-bold mb-1">Education</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Timeline entries for school, courses, and certifications.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+
+            <Link
+              href="/admin/social-links"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <Share2 className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">{socialLinks?.length || 0} items</span>
+              </div>
+              <div className="text-lg font-bold mb-1">Social Links</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Hero icons, URLs, and display order.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+          </div>
         </div>
         
         {/* Posts list */}

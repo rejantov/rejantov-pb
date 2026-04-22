@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Terminal, Loader2, ArrowLeft } from "lucide-react"
@@ -12,7 +12,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+  const routeError = searchParams.get("error")
+
+  const routeErrorMessage =
+    routeError === "unauthorized"
+      ? "This admin area is restricted to the configured owner account."
+      : routeError === "auth_failed"
+        ? "Authentication failed. Please try logging in again."
+        : null
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,7 +34,11 @@ export default function LoginPage() {
     })
     
     if (error) {
-      setError(error.message)
+      setError(
+        error.message === "Invalid login credentials"
+          ? "Invalid login credentials. This usually means the user has not been created in Supabase Auth yet, or the password is incorrect."
+          : error.message,
+      )
       setLoading(false)
       return
     }
@@ -68,6 +81,12 @@ export default function LoginPage() {
             {error && (
               <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm font-mono">
                 Error: {error}
+              </div>
+            )}
+
+            {!error && routeErrorMessage && (
+              <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm font-mono">
+                Error: {routeErrorMessage}
               </div>
             )}
             
@@ -119,11 +138,8 @@ export default function LoginPage() {
               </button>
             </form>
             
-            <p className="mt-6 text-center text-muted-foreground text-sm">
-              {"Don't have an account? "}
-              <Link href="/auth/signup" className="text-primary hover:underline">
-                Sign up
-              </Link>
+            <p className="mt-6 text-center text-muted-foreground text-sm font-mono">
+              Private admin access only
             </p>
           </div>
         </div>

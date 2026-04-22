@@ -66,7 +66,6 @@ CREATE TABLE IF NOT EXISTS profile (
   name TEXT NOT NULL,
   title TEXT NOT NULL,
   bio TEXT NOT NULL,
-  avatar_url TEXT,
   resume_url TEXT,
   email TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -92,12 +91,12 @@ CREATE POLICY "Public read access for published posts" ON blog_posts FOR SELECT 
 CREATE POLICY "Public read access for blog_media" ON blog_media FOR SELECT USING (true);
 
 -- Authenticated users can manage all content (admin)
-CREATE POLICY "Admin full access projects" ON projects FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Admin full access education" ON education FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Admin full access social_links" ON social_links FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Admin full access profile" ON profile FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Admin full access blog_posts" ON blog_posts FOR ALL USING (auth.uid() IS NOT NULL);
-CREATE POLICY "Admin full access blog_media" ON blog_media FOR ALL USING (auth.uid() IS NOT NULL);
+CREATE POLICY "Admin full access projects" ON projects FOR ALL USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Admin full access education" ON education FOR ALL USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Admin full access social_links" ON social_links FOR ALL USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Admin full access profile" ON profile FOR ALL USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Admin full access blog_posts" ON blog_posts FOR ALL USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Admin full access blog_media" ON blog_media FOR ALL USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);

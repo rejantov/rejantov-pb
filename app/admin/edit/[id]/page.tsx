@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation"
+import { isAdminEmail } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
 import { BlogEditor } from "@/components/admin/blog-editor"
 
@@ -14,6 +15,10 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   
   if (!user) {
     redirect("/auth/login")
+  }
+
+  if (!isAdminEmail(user.email)) {
+    redirect("/auth/login?error=unauthorized")
   }
   
   const { data: post } = await supabase
