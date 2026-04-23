@@ -11,11 +11,11 @@ export default async function AdminProjectsPage() {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect("/auth/login")
+    redirect("/login")
   }
 
   if (!isAdminEmail(user.email)) {
-    redirect("/auth/login?error=unauthorized")
+    redirect("/login?error=unauthorized")
   }
 
   const { data: projects } = await supabase

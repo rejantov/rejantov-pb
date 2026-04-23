@@ -17,12 +17,12 @@ export async function GET(request: Request) {
 
       if (!isAdminEmail(user?.email)) {
         await supabase.auth.signOut()
-        return NextResponse.redirect(`${origin}/auth/login?error=unauthorized`)
+        return NextResponse.redirect(`${origin}/login?error=unauthorized`)
       }
 
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`)
+  return NextResponse.redirect(`${origin}/login?error=auth_failed`)
 }

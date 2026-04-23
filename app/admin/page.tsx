@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { isAdminEmail } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
-import { Terminal, Plus, Edit2, Eye, EyeOff, UserRound, FolderKanban, GraduationCap, Share2, FileText } from "lucide-react"
+import { Terminal, Plus, Edit2, Eye, EyeOff, UserRound, FolderKanban, GraduationCap, Share2, FileText, Briefcase } from "lucide-react"
 import { DeletePostButton, LogoutButton } from "./admin-actions"
 
 export default async function AdminPage() {
@@ -11,20 +11,22 @@ export default async function AdminPage() {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
-    redirect("/auth/login")
+    redirect("/login")
   }
 
   if (!isAdminEmail(user.email)) {
-    redirect("/auth/login?error=unauthorized")
+    redirect("/login?error=unauthorized")
   }
 
-  const [{ data: posts }, { data: projects }, { data: education }, { data: socialLinks }, { data: profile }] =
+  const [{ data: posts }, { data: projects }, { data: education }, { data: socialLinks }, { data: profile }, { data: workExperience }, { data: activeResume }] =
     await Promise.all([
       supabase.from("blog_posts").select("*").order("created_at", { ascending: false }),
       supabase.from("projects").select("id"),
       supabase.from("education").select("id"),
       supabase.from("social_links").select("id"),
-      supabase.from("profile").select("id, resume_url").limit(1),
+      supabase.from("profile").select("id").limit(1),
+      supabase.from("work_experience").select("id"),
+      supabase.from("resumes").select("id").eq("is_active", true).maybeSingle(),
     ])
   
   const formatDate = (date: string) => {
@@ -89,7 +91,7 @@ export default async function AdminPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             <Link
               href="/admin/profile"
               className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
@@ -114,12 +116,27 @@ export default async function AdminPage() {
               <div className="flex items-center justify-between mb-4">
                 <FileText className="h-5 w-5 text-primary" />
                 <span className="text-xs font-mono text-muted-foreground">
-                  {profile?.[0]?.resume_url ? "Uploaded" : "Missing"}
+                  {activeResume ? "Active" : "Missing"}
                 </span>
               </div>
               <div className="text-lg font-bold mb-1">Resume</div>
               <p className="text-sm text-muted-foreground mb-3">
-                Upload and replace your PDF resume.
+                Upload and manage PDF resumes, choose which one visitors see.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+
+            <Link
+              href="/admin/experience"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <Briefcase className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">{workExperience?.length || 0} items</span>
+              </div>
+              <div className="text-lg font-bold mb-1">Experience</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Work history timeline — companies, roles, and dates.
               </p>
               <div className="text-xs font-mono text-primary">Open editor</div>
             </Link>

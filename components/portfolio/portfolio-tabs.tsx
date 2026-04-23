@@ -1,23 +1,25 @@
 "use client"
 
 import { useState } from "react"
-import { Code, GraduationCap, FileText } from "lucide-react"
+import { Briefcase, Code, FileText, GraduationCap } from "lucide-react"
 
 interface PortfolioTabsProps {
   projectsContent: React.ReactNode
+  experienceContent: React.ReactNode
   educationContent: React.ReactNode
   cvContent: React.ReactNode
 }
 
 const tabs = [
   { id: "projects", label: "Projects", icon: Code },
+  { id: "experience", label: "Experience", icon: Briefcase },
   { id: "education", label: "Education", icon: GraduationCap },
   { id: "cv", label: "CV/Resume", icon: FileText },
 ]
 
-export function PortfolioTabs({ projectsContent, educationContent, cvContent }: PortfolioTabsProps) {
+export function PortfolioTabs({ projectsContent, experienceContent, educationContent, cvContent }: PortfolioTabsProps) {
   const [activeTab, setActiveTab] = useState("projects")
-  
+
   return (
     <section className="py-16 px-4">
       <div className="max-w-6xl mx-auto">
@@ -41,10 +43,11 @@ export function PortfolioTabs({ projectsContent, educationContent, cvContent }: 
             )
           })}
         </div>
-        
+
         {/* Tab content */}
         <div className="min-h-[400px]">
           {activeTab === "projects" && projectsContent}
+          {activeTab === "experience" && experienceContent}
           {activeTab === "education" && educationContent}
           {activeTab === "cv" && cvContent}
         </div>

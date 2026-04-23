@@ -73,7 +73,7 @@ export default async function BlogPage() {
         <span className="text-fuchsia-300">|</span>
         <span className="text-fuchsia-200 blink">YOU ARE HERE: BLOG</span>
         <span className="text-fuchsia-300">|</span>
-        <Link href="/auth/login" className="text-white hover:text-yellow-300 transition-colors">
+        <Link href="/login" className="text-white hover:text-yellow-300 transition-colors">
           {"ADMIN >>"}
         </Link>
         <span className="text-fuchsia-300">]</span>

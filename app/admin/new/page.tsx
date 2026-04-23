@@ -9,11 +9,11 @@ export default async function NewPostPage() {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
-    redirect("/auth/login")
+    redirect("/login")
   }
 
   if (!isAdminEmail(user.email)) {
-    redirect("/auth/login?error=unauthorized")
+    redirect("/login?error=unauthorized")
   }
   
   return <BlogEditor userId={user.id} />

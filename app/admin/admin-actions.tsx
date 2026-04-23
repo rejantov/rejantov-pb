@@ -50,6 +50,8 @@ export function LogoutButton() {
   
   const handleLogout = async () => {
     setLoading(true)
+    // Clear the browser-session marker so re-opening admin requires a new login
+    document.cookie = "admin-active=; path=/; max-age=0; SameSite=Strict"
     await supabase.auth.signOut()
     router.push("/")
     router.refresh()
