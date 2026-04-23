@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation"
 import { isAdminEmail } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
-import { SocialLinksManager } from "@/components/admin/social-links-manager"
+import { ExperienceManager } from "@/components/admin/experience-manager"
 
-export default async function AdminSocialLinksPage() {
+export default async function AdminExperiencePage() {
   const supabase = await createClient()
 
   const {
@@ -18,10 +18,10 @@ export default async function AdminSocialLinksPage() {
     redirect("/login?error=unauthorized")
   }
 
-  const { data: socialLinks } = await supabase
-    .from("social_links")
+  const { data: experience } = await supabase
+    .from("work_experience")
     .select("*")
-    .order("display_order")
+    .order("start_date", { ascending: false })
 
-  return <SocialLinksManager initialLinks={socialLinks ?? []} />
+  return <ExperienceManager initialExperience={experience ?? []} />
 }

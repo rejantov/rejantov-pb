@@ -38,17 +38,26 @@ export async function updateSession(request: NextRequest) {
 
   // Protect admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/login'
+    loginUrl.search = ''
 
     if (!user) {
-      return NextResponse.redirect(url)
+      return NextResponse.redirect(loginUrl)
     }
 
     if (!isAdminEmail(user.email)) {
       await supabase.auth.signOut()
-      url.searchParams.set('error', 'unauthorized')
-      return NextResponse.redirect(url)
+      loginUrl.searchParams.set('error', 'unauthorized')
+      return NextResponse.redirect(loginUrl)
+    }
+
+    // If the browser session ended (tab closed), admin-active cookie is gone.
+    // Sign the user out so they must re-authenticate.
+    const adminActive = request.cookies.get('admin-active')
+    if (!adminActive) {
+      await supabase.auth.signOut()
+      return NextResponse.redirect(loginUrl)
     }
   }
 

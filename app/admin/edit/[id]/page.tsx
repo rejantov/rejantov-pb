@@ -14,11 +14,11 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
-    redirect("/auth/login")
+    redirect("/login")
   }
 
   if (!isAdminEmail(user.email)) {
-    redirect("/auth/login?error=unauthorized")
+    redirect("/login?error=unauthorized")
   }
   
   const { data: post } = await supabase

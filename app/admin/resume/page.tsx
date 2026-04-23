@@ -11,18 +11,24 @@ export default async function AdminResumePage() {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect("/auth/login")
+    redirect("/login")
   }
 
   if (!isAdminEmail(user.email)) {
-    redirect("/auth/login?error=unauthorized")
+    redirect("/login?error=unauthorized")
   }
 
-  const { data: profile } = await supabase
-    .from("profile")
-    .select("id, name, title, resume_url")
-    .limit(1)
-    .maybeSingle()
+  const [{ data: profile }, { data: resumes }] = await Promise.all([
+    supabase
+      .from("profile")
+      .select("id, name, title")
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("resumes")
+      .select("*")
+      .order("uploaded_at", { ascending: false }),
+  ])
 
-  return <ResumeManager profile={profile} />
+  return <ResumeManager profile={profile} initialResumes={resumes ?? []} />
 }
