@@ -20,7 +20,7 @@ export function Navigation() {
           <Link href="/" className="flex items-center gap-2 group">
             <Terminal className="h-6 w-6 text-primary group-hover:neon-text transition-all" />
             <span className="font-mono text-lg font-bold tracking-tight">
-              <span className="text-primary">&gt;</span> cyber_dev
+              <span className="text-primary">&gt;</span> my_porto_blog
             </span>
           </Link>
           

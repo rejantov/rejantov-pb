@@ -1,31 +1,32 @@
-import { put } from "@vercel/blob"
 import { type NextRequest, NextResponse } from "next/server"
 import { isAdminEmail } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
 
+const BUCKET = "blog-media"
+
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-
     if (!isAdminEmail(user.email)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
-    
+
     const formData = await request.formData()
     const file = formData.get("file") as File
-    
+
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
-    
-    // Validate file type
-    const allowedTypes = [
+
+    // Validate file type — check both MIME type and extension
+    const allowedMime = [
       "image/jpeg",
       "image/png",
       "image/gif",
@@ -33,16 +34,19 @@ export async function POST(request: NextRequest) {
       "video/mp4",
       "video/webm",
       "application/pdf",
+      "text/markdown",
+      "text/x-markdown",
+      "text/plain",
     ]
-    
-    if (!allowedTypes.includes(file.type)) {
+    const isMarkdown = file.name.toLowerCase().endsWith(".md")
+
+    if (!allowedMime.includes(file.type) && !isMarkdown) {
       return NextResponse.json(
-        { error: "Invalid file type. Allowed: images, videos, PDFs" },
+        { error: "Invalid file type. Allowed: images, videos, PDFs, .md files" },
         { status: 400 }
       )
     }
-    
-    // Max file size: 50MB
+
     const maxSize = 50 * 1024 * 1024
     if (file.size > maxSize) {
       return NextResponse.json(
@@ -50,18 +54,37 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
-    // Generate unique filename
+
     const timestamp = Date.now()
     const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, "_")
-    const pathname = `blog/${timestamp}-${safeFilename}`
-    
-    // Upload to Vercel Blob
-    const blob = await put(pathname, file, {
-      access: "public",
-    })
-    
-    return NextResponse.json({ url: blob.url })
+    const pathname = `${timestamp}-${safeFilename}`
+
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(pathname, file, { contentType: file.type, upsert: false })
+
+    if (uploadError) {
+      if (
+        uploadError.message?.toLowerCase().includes("bucket") ||
+        uploadError.message?.toLowerCase().includes("not found")
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Storage bucket 'blog-media' not found. Run scripts/006_create_storage_bucket.sql in your Supabase SQL editor, then try again.",
+          },
+          { status: 500 }
+        )
+      }
+      throw uploadError
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(BUCKET).getPublicUrl(pathname)
+
+    return NextResponse.json({ url: publicUrl })
   } catch (error) {
     console.error("Upload error:", error)
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })

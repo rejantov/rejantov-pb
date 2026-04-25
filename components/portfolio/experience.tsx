@@ -1,4 +1,4 @@
-import { Briefcase, Calendar, MapPin } from "lucide-react"
+import { Calendar, MapPin } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 
 export async function Experience() {
@@ -6,7 +6,7 @@ export async function Experience() {
   const { data: experience } = await supabase
     .from("work_experience")
     .select("*")
-    .order("start_date", { ascending: false })
+    .order("start_date", { ascending: true })
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "short" })
