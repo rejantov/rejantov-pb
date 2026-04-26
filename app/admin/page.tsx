@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { isAdminEmail } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
-import { Terminal, Plus, Edit2, Eye, EyeOff, UserRound, FolderKanban, GraduationCap, Share2, FileText, Briefcase } from "lucide-react"
+import { Terminal, Plus, Edit2, Eye, EyeOff, UserRound, FolderKanban, GraduationCap, Share2, FileText, Briefcase, Activity, Palette } from "lucide-react"
 import { DeletePostButton, LogoutButton } from "./admin-actions"
 
 export default async function AdminPage() {
@@ -182,6 +182,36 @@ export default async function AdminPage() {
               <div className="text-lg font-bold mb-1">Social Links</div>
               <p className="text-sm text-muted-foreground mb-3">
                 Hero icons, URLs, and display order.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+
+            <Link
+              href="/admin/currently"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <Activity className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">Blog sidebar</span>
+              </div>
+              <div className="text-lg font-bold mb-1">Currently</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Playing, reading, listening, and mood shown in the blog sidebar.
+              </p>
+              <div className="text-xs font-mono text-primary">Open editor</div>
+            </Link>
+
+            <Link
+              href="/admin/appearance"
+              className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <Palette className="h-5 w-5 text-primary" />
+                <span className="text-xs font-mono text-muted-foreground">Site-wide</span>
+              </div>
+              <div className="text-lg font-bold mb-1">Appearance</div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Accent colour — purple, blue, green, pink, red, yellow, or rainbow.
               </p>
               <div className="text-xs font-mono text-primary">Open editor</div>
             </Link>

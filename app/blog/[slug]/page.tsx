@@ -2,8 +2,25 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { marked } from "marked"
 import { createClient } from "@/lib/supabase/server"
-import { ArrowLeft, Calendar, Sparkles, Star, Tag } from "lucide-react"
+import { ArrowLeft, Calendar, Sparkles, Star } from "lucide-react"
 import { BlogPostActions } from "@/components/blog/blog-post-actions"
+
+const CATEGORY_STYLES: Record<string, string> = {
+  Tech:                "bg-blue-500/20 text-blue-300 border-blue-500/50 hover:bg-blue-500/30",
+  Cybersecurity:       "bg-green-500/20 text-green-300 border-green-500/50 hover:bg-green-500/30",
+  "League of Legends": "bg-purple-500/20 text-purple-300 border-purple-500/50 hover:bg-purple-500/30",
+  Books:               "bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30",
+  Hiking:              "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 hover:bg-emerald-500/30",
+  Life:                "bg-pink-500/20 text-pink-300 border-pink-500/50 hover:bg-pink-500/30",
+  Random:              "bg-orange-500/20 text-orange-300 border-orange-500/50 hover:bg-orange-500/30",
+  Travel:              "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 hover:bg-cyan-500/30",
+}
+const FALLBACK_STYLES = [
+  "bg-violet-500/20 text-violet-300 border-violet-500/50 hover:bg-violet-500/30",
+  "bg-rose-500/20 text-rose-300 border-rose-500/50 hover:bg-rose-500/30",
+  "bg-teal-500/20 text-teal-300 border-teal-500/50 hover:bg-teal-500/30",
+  "bg-indigo-500/20 text-indigo-300 border-indigo-500/50 hover:bg-indigo-500/30",
+]
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
@@ -114,17 +131,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             {/* Categories */}
             {post.categories && post.categories.length > 0 && (
-              <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-                <Tag className="h-3 w-3 text-fuchsia-400" />
-                {post.categories.map((cat: string) => (
-                  <Link
-                    key={cat}
-                    href={`/blog?category=${encodeURIComponent(cat)}`}
-                    className="px-2 py-0.5 text-xs font-mono bg-fuchsia-900/40 text-fuchsia-300 border border-fuchsia-600/50 rounded-full hover:bg-fuchsia-800/40 hover:text-fuchsia-100 transition-all"
-                  >
-                    {cat}
-                  </Link>
-                ))}
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
+                {post.categories.map((cat: string, i: number) => {
+                  const style = CATEGORY_STYLES[cat] ?? FALLBACK_STYLES[i % FALLBACK_STYLES.length]
+                  return (
+                    <Link
+                      key={cat}
+                      href={`/blog?category=${encodeURIComponent(cat)}`}
+                      className={`px-3 py-1 text-xs font-mono border rounded-full transition-all ${style}`}
+                    >
+                      {cat}
+                    </Link>
+                  )
+                })}
               </div>
             )}
 

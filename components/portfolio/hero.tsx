@@ -41,28 +41,26 @@ export async function Hero() {
 
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center py-20 px-4 overflow-hidden">
-      {/* Subtle gradient background - no grid */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-950/20 via-transparent to-fuchsia-950/10" />
-
-      {/* Ambient glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-fuchsia-600/10 rounded-full blur-3xl" />
+      {/* Ambient glow */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
 
       <div className="relative z-10 max-w-3xl mx-auto text-center">
         {/* Terminal-style header */}
         <div className="inline-block mb-8">
-          <div className="bg-card/80 backdrop-blur border-2 border-purple-500/50 rounded-lg overflow-hidden neon-glow">
-            <div className="flex items-center gap-2 px-4 py-2 bg-purple-900/50 border-b border-purple-500/50">
+          <div className="bg-card/80 backdrop-blur border-2 border-primary/50 rounded-lg overflow-hidden neon-glow">
+            <div className="flex items-center gap-2 px-4 py-2 bg-primary/20 border-b border-primary/30">
               <div className="w-3 h-3 rounded-full bg-red-500" />
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
               <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="ml-2 text-xs text-purple-300 font-mono">terminal</span>
+              <span className="ml-2 text-xs text-primary/80 font-mono">terminal</span>
             </div>
             <div className="px-6 py-4 font-mono text-sm text-left">
-              <p className="text-purple-400">
-                <span className="text-fuchsia-400">$</span> whoami
+              <p className="text-primary/70">
+                <span className="text-primary">$</span> whoami
               </p>
-              <p className="text-white mt-1 neon-text">
+              <p className="text-foreground mt-1 neon-text">
                 {profile?.name || "Anonymous Hacker"}
               </p>
             </div>
@@ -71,17 +69,17 @@ export async function Hero() {
 
         {/* Main heading */}
         <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
-          <span className="text-white">{profile?.name?.split(" ")[0] || "Cyber"}</span>
-          <span className="text-fuchsia-400 neon-text"> {profile?.name?.split(" ").slice(1).join(" ") || "Dev"}</span>
+          <span className="text-foreground">{profile?.name?.split(" ")[0] || "Cyber"}</span>
+          <span className="text-primary neon-text"> {profile?.name?.split(" ").slice(1).join(" ") || "Dev"}</span>
         </h1>
 
-        {/* Title with neon effect */}
-        <p className="text-xl md:text-2xl text-purple-400 font-mono mb-6 neon-text-pink">
+        {/* Title */}
+        <p className="text-xl md:text-2xl text-primary font-mono mb-6 neon-text-pink">
           {profile?.title || "Full Stack Developer"}
         </p>
 
         {/* Bio */}
-        <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8">
+        <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl mx-auto mb-8">
           {profile?.bio || "Loading bio..."}
         </p>
 
@@ -97,10 +95,10 @@ export async function Hero() {
                 href={href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="p-3 rounded-lg border-2 border-purple-500/50 bg-purple-900/20 hover:border-fuchsia-400 hover:bg-purple-800/30 hover:neon-glow transition-all group"
+                className="p-3 rounded-lg border-2 border-primary/50 bg-primary/10 hover:border-primary hover:bg-primary/20 hover:neon-glow transition-all group"
                 aria-label={link.platform}
               >
-                <Icon className="h-5 w-5 text-purple-300 group-hover:text-fuchsia-400 transition-colors" />
+                <Icon className="h-5 w-5 text-primary/70 group-hover:text-primary transition-colors" />
               </a>
             )
           })}
@@ -110,15 +108,15 @@ export async function Hero() {
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm font-mono text-muted-foreground">
           <a
             href="tel:+38346148528"
-            className="flex items-center gap-2 hover:text-purple-300 transition-colors"
+            className="flex items-center gap-2 hover:text-primary transition-colors"
           >
             <Phone className="h-4 w-4" />
             +383 46148528
           </a>
-          <span className="hidden sm:block text-purple-700">|</span>
+          <span className="hidden sm:block text-border">|</span>
           <a
             href="mailto:rejantoverlani00@gmail.com"
-            className="flex items-center gap-2 hover:text-purple-300 transition-colors"
+            className="flex items-center gap-2 hover:text-primary transition-colors"
           >
             <Mail className="h-4 w-4" />
             rejantoverlani00@gmail.com
