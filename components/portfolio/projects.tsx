@@ -26,11 +26,19 @@ export async function Projects() {
             </div>
           )}
           
-          {/* Project image placeholder */}
-          <div className="h-48 bg-secondary/30 border-b border-border flex items-center justify-center">
-            <div className="text-6xl font-mono text-primary/30 group-hover:text-primary/50 transition-colors">
-              {"</>"}
-            </div>
+          {/* Project image */}
+          <div className="h-48 bg-secondary/30 border-b border-border overflow-hidden flex items-center justify-center">
+            {project.image_url ? (
+              <img
+                src={project.image_url}
+                alt={project.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="text-6xl font-mono text-primary/30 group-hover:text-primary/50 transition-colors">
+                {"</>"}
+              </div>
+            )}
           </div>
           
           {/* Content */}

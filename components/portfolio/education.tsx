@@ -10,7 +10,7 @@ function getDegreeTag(degree: string): { label: string; className: string } {
     return { label: "PhD", className: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40" }
   }
   if (d.includes("master") || d.includes("m.s.") || d.includes("m.a.") || d.includes("msc")) {
-    return { label: "Master", className: "bg-purple-500/20 text-purple-300 border-purple-500/40" }
+    return { label: "Master", className: "bg-primary/20 text-primary border-primary/40" }
   }
   if (d.includes("bachelor") || d.includes("b.s.") || d.includes("b.a.") || d.includes("bsc")) {
     return { label: "Bachelor", className: "bg-blue-500/20 text-blue-300 border-blue-500/40" }

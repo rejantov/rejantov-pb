@@ -8,10 +8,7 @@ import {
   Gamepad2,
   BookOpen,
   Mountain,
-  Code,
-  Coffee,
   Music,
-  Tag,
   Calendar,
   X,
 } from "lucide-react"
@@ -24,17 +21,25 @@ interface BlogPageProps {
   searchParams: Promise<{ category?: string; query?: string }>
 }
 
-
-const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Tech: Code,
-  Cybersecurity: Code,
-  "League of Legends": Gamepad2,
-  Books: BookOpen,
-  Hiking: Mountain,
-  Life: Heart,
-  Random: Coffee,
-  Travel: Mountain,
+const CATEGORY_STYLES: Record<string, string> = {
+  Tech:                "bg-blue-500/20 text-blue-300 border-blue-500/50",
+  Cybersecurity:       "bg-green-500/20 text-green-300 border-green-500/50",
+  "League of Legends": "bg-purple-500/20 text-purple-300 border-purple-500/50",
+  Books:               "bg-amber-500/20 text-amber-300 border-amber-500/50",
+  Hiking:              "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+  Life:                "bg-pink-500/20 text-pink-300 border-pink-500/50",
+  Random:              "bg-orange-500/20 text-orange-300 border-orange-500/50",
+  Travel:              "bg-cyan-500/20 text-cyan-300 border-cyan-500/50",
 }
+
+const FALLBACK_STYLES = [
+  "bg-violet-500/20 text-violet-300 border-violet-500/50",
+  "bg-rose-500/20 text-rose-300 border-rose-500/50",
+  "bg-teal-500/20 text-teal-300 border-teal-500/50",
+  "bg-indigo-500/20 text-indigo-300 border-indigo-500/50",
+  "bg-lime-500/20 text-lime-300 border-lime-500/50",
+  "bg-sky-500/20 text-sky-300 border-sky-500/50",
+]
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { category: selectedCategory, query: searchQuery } = await searchParams
@@ -43,12 +48,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   // All published posts ordered oldest→newest — for rank numbering, categories, and total likes
   const { data: allPublished } = await supabase
     .from("blog_posts")
-    .select("id, likes, categories")
+    .select("*")
     .eq("published", true)
     .order("created_at", { ascending: true })
-
-  // Build global rank map: post id → rank (1 = oldest)
-  const rankMap = new Map(allPublished?.map((p, i) => [p.id, i + 1]) ?? [])
 
   // Extract unique categories (graceful: categories column may not exist yet)
   const allCategories = [
@@ -58,6 +60,32 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   ].sort()
 
   const totalLikes = allPublished?.reduce((sum, p) => sum + ((p.likes as number) ?? 0), 0) ?? 0
+
+  // Stable color index per category (alphabetical order)
+  const catIndexMap = new Map<string, number>(allCategories.map((cat, i) => [cat, i]))
+
+  // Post count per category (for sidebar badges)
+  const catCount = new Map<string, number>()
+  allPublished?.forEach((p) => {
+    ;(p.categories as string[] | null)?.forEach((cat) => {
+      catCount.set(cat, (catCount.get(cat) ?? 0) + 1)
+    })
+  })
+
+  // Fetch "Currently" sidebar data
+  const { data: currentlyRows } = await supabase
+    .from("site_stats")
+    .select("key, text_value")
+    .in("key", ["currently_playing", "currently_reading", "currently_listening", "currently_mood"])
+  const currentlyMap = Object.fromEntries(
+    (currentlyRows ?? []).map((r) => [r.key.replace("currently_", ""), r.text_value as string])
+  )
+  const currently = {
+    playing:   currentlyMap.playing   ?? "League (ofc)",
+    reading:   currentlyMap.reading   ?? "TBD",
+    listening: currentlyMap.listening ?? "Lo-fi",
+    mood:      currentlyMap.mood      ?? "vibing",
+  }
 
   // Fetch opened count from site_stats (graceful: table may not exist yet)
   const { data: statRow } = await supabase
@@ -214,25 +242,26 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 </Link>
 
                 {allCategories.length > 0 ? (
-                  allCategories.map((cat) => {
-                    const Icon = CATEGORY_ICONS[cat] ?? Tag
-                    const isActive = selectedCategory === cat
-                    return (
-                      <Link
-                        key={cat}
-                        href={isActive ? "/blog" : `/blog?category=${encodeURIComponent(cat)}`}
-                        className={`flex items-center gap-2 py-1 text-sm transition-colors ${
-                          isActive
-                            ? "text-yellow-300 font-bold"
-                            : "text-gray-300 hover:text-white"
-                        }`}
-                      >
-                        <Icon className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{cat}</span>
-                        {isActive && <span className="ml-auto text-xs text-yellow-500">◄</span>}
-                      </Link>
-                    )
-                  })
+                  <div className="flex flex-col gap-1.5 mt-1">
+                    {allCategories.map((cat) => {
+                      const isActive = selectedCategory === cat
+                      const idx = catIndexMap.get(cat) ?? 0
+                      const style = CATEGORY_STYLES[cat] ?? FALLBACK_STYLES[idx % FALLBACK_STYLES.length]
+                      const count = catCount.get(cat) ?? 0
+                      return (
+                        <Link
+                          key={cat}
+                          href={isActive ? "/blog" : `/blog?category=${encodeURIComponent(cat)}`}
+                          className={`flex items-center justify-between gap-2 px-2 py-1.5 rounded border text-xs font-mono transition-all ${style} ${
+                            isActive ? "opacity-100 font-bold ring-1 ring-current" : "opacity-60 hover:opacity-100"
+                          }`}
+                        >
+                          <span className="truncate">{cat}</span>
+                          <span className="shrink-0 opacity-75">{count}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
                 ) : (
                   <p className="text-xs text-muted-foreground text-center py-2">
                     No categories yet
@@ -248,20 +277,20 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 <div className="text-sm space-y-2">
                   <p>
                     <span className="text-fuchsia-400">Playing: </span>
-                    <span className="text-white">League (ofc)</span>
+                    <span className="text-white">{currently.playing}</span>
                   </p>
                   <p>
                     <span className="text-fuchsia-400">Reading: </span>
-                    <span className="text-white">TBD</span>
+                    <span className="text-white">{currently.reading}</span>
                   </p>
                   <p className="flex items-center gap-1">
                     <span className="text-fuchsia-400">Listening: </span>
                     <Music className="h-3 w-3 text-white" />
-                    <span className="text-white">Lo-fi</span>
+                    <span className="text-white">{currently.listening}</span>
                   </p>
                   <p>
                     <span className="text-fuchsia-400">Mood: </span>
-                    <span className="text-green-400">vibing</span>
+                    <span className="text-green-400">{currently.mood}</span>
                   </p>
                 </div>
               </div>
@@ -269,8 +298,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               <div className="retro-box p-4 text-center">
                 <div className="text-3xl mb-2 spin-slow inline-block">{"@"}</div>
                 <p className="text-xs text-fuchsia-300">MADE WITH</p>
-                <p className="text-fuchsia-400 font-bold text-sm">100% PASSION</p>
-                <p className="text-xs text-fuchsia-300">AND 0% SLEEP</p>
+                <p className="text-fuchsia-400 font-bold text-sm">95% PASSION</p>
+                <p className="text-xs text-fuchsia-300">AND 5% SLEEP</p>
               </div>
             </aside>
 
@@ -303,16 +332,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
               {posts && posts.length > 0 ? (
                 <div className="space-y-5">
-                  {posts.map((post) => {
-                    const postNum = rankMap.get(post.id) ?? 0
-                    return (
+                  {posts.map((post, index) => (
                       <article key={post.id} className="retro-box p-5 hover-glow transition-all">
                         <Link href={`/blog/${post.slug}`} className="block">
                           <div className="flex items-start gap-4">
-                            {/* Global post number */}
                             <div className="hidden sm:block shrink-0">
                               <span className="text-2xl font-bold text-fuchsia-500 neon-text font-mono">
-                                #{postNum.toString().padStart(2, "0")}
+                                #{(posts.length - index).toString().padStart(2, "0")}
                               </span>
                             </div>
 
@@ -328,14 +354,18 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
                               {post.categories && post.categories.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mb-2">
-                                  {post.categories.map((cat: string) => (
-                                    <span
-                                      key={cat}
-                                      className="px-2 py-0.5 text-xs font-mono bg-fuchsia-900/40 text-fuchsia-300 border border-fuchsia-700/50 rounded-full"
-                                    >
-                                      {cat}
-                                    </span>
-                                  ))}
+                                  {post.categories.map((cat: string) => {
+                                    const idx = catIndexMap.get(cat) ?? 0
+                                    const style = CATEGORY_STYLES[cat] ?? FALLBACK_STYLES[idx % FALLBACK_STYLES.length]
+                                    return (
+                                      <span
+                                        key={cat}
+                                        className={`px-2 py-0.5 text-xs font-mono border rounded-full ${style}`}
+                                      >
+                                        {cat}
+                                      </span>
+                                    )
+                                  })}
                                 </div>
                               )}
 
@@ -367,8 +397,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                           </div>
                         </Link>
                       </article>
-                    )
-                  })}
+                  ))}
                 </div>
               ) : (
                 <div className="retro-box p-8 text-center">

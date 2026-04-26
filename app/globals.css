@@ -1,17 +1,70 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* Register --accent-hue as an animatable property for rainbow mode */
+@property --accent-hue {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 280;
+}
+
 @custom-variant dark (&:is(.dark *));
 
+/* ——— Accent colour presets ——— */
+[data-accent="purple"] { --accent-hue: 280; }
+[data-accent="blue"]   { --accent-hue: 220; }
+[data-accent="green"]  { --accent-hue: 140; }
+[data-accent="pink"]   { --accent-hue: 320; }
+[data-accent="red"]    { --accent-hue: 5;   }
+[data-accent="yellow"] { --accent-hue: 55;  }
+
+[data-accent="rainbow"] {
+  animation: hue-rotate-accent 4s linear infinite;
+}
+
+@keyframes hue-rotate-accent {
+  from { --accent-hue: 0; }
+  to   { --accent-hue: 360; }
+}
+
+/* ——— Light theme (default) ——— */
 :root {
-  /* Cyberpunk Dark Theme */
+  --background: 0 0% 97%;
+  --foreground: 260 20% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 260 20% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 260 20% 8%;
+  --primary: var(--accent-hue) 65% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 260 10% 92%;
+  --secondary-foreground: 260 20% 20%;
+  --muted: 260 10% 94%;
+  --muted-foreground: 260 10% 45%;
+  --accent: 300 60% 70%;
+  --accent-foreground: 300 60% 20%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 260 10% 88%;
+  --input: 260 10% 93%;
+  --ring: var(--accent-hue) 65% 45%;
+  --radius: 0.5rem;
+
+  --neon-purple: var(--accent-hue) 65% 45%;
+  --neon-pink: 320 65% 45%;
+  --neon-cyan: 180 65% 40%;
+  --neon-blue: 220 65% 45%;
+}
+
+/* ——— Dark theme ——— */
+.dark {
   --background: 260 20% 8%;
   --foreground: 260 10% 95%;
   --card: 260 20% 10%;
   --card-foreground: 260 10% 95%;
   --popover: 260 20% 9%;
   --popover-foreground: 260 10% 95%;
-  --primary: 280 80% 60%;
+  --primary: var(--accent-hue) 80% 60%;
   --primary-foreground: 260 20% 8%;
   --secondary: 260 15% 15%;
   --secondary-foreground: 260 10% 90%;
@@ -21,13 +74,11 @@
   --accent-foreground: 260 20% 8%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
-  --border: 280 40% 25%;
+  --border: var(--accent-hue) 40% 25%;
   --input: 260 15% 12%;
-  --ring: 280 80% 60%;
-  --radius: 0.5rem;
-  
-  /* Neon colors */
-  --neon-purple: 280 80% 60%;
+  --ring: var(--accent-hue) 80% 60%;
+
+  --neon-purple: var(--accent-hue) 80% 60%;
   --neon-pink: 320 80% 60%;
   --neon-cyan: 180 70% 60%;
   --neon-blue: 240 70% 60%;
@@ -59,8 +110,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  
-  /* Custom neon colors */
+
   --color-neon-purple: hsl(var(--neon-purple));
   --color-neon-pink: hsl(var(--neon-pink));
   --color-neon-cyan: hsl(var(--neon-cyan));
@@ -72,32 +122,32 @@
     @apply border-border outline-ring/50;
   }
   html {
-    background-color: hsl(260 20% 8%);
+    background-color: hsl(var(--background));
   }
   body {
-    background-color: hsl(260 20% 8%);
-    color: hsl(260 10% 95%);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
 /* Cyberpunk utility classes */
 @layer utilities {
   .neon-text {
-    text-shadow: 0 0 10px hsl(280 80% 60%), 0 0 20px hsl(280 80% 60%), 0 0 40px hsl(280 80% 60%);
+    text-shadow: 0 0 10px hsl(var(--accent-hue) 80% 60%), 0 0 20px hsl(var(--accent-hue) 80% 60%), 0 0 40px hsl(var(--accent-hue) 80% 60%);
   }
-  
+
   .neon-text-pink {
     text-shadow: 0 0 10px hsl(320 80% 60%), 0 0 20px hsl(320 80% 60%), 0 0 40px hsl(320 80% 60%);
   }
-  
+
   .neon-border {
-    box-shadow: 0 0 5px hsl(280 80% 60%), 0 0 10px hsl(280 80% 60%), inset 0 0 5px hsl(280 80% 60%);
+    box-shadow: 0 0 5px hsl(var(--accent-hue) 80% 60%), 0 0 10px hsl(var(--accent-hue) 80% 60%), inset 0 0 5px hsl(var(--accent-hue) 80% 60%);
   }
-  
+
   .neon-glow {
-    box-shadow: 0 0 20px hsl(280 80% 60% / 0.5);
+    box-shadow: 0 0 20px hsl(var(--accent-hue) 80% 60% / 0.5);
   }
-  
+
   .scanline {
     background: repeating-linear-gradient(
       0deg,
@@ -108,13 +158,13 @@
     );
     pointer-events: none;
   }
-  
+
   .glitch {
     animation: glitch 2s infinite;
   }
-  
+
   .cyber-grid {
-    background-image: 
+    background-image:
       linear-gradient(hsl(var(--border)) 1px, transparent 1px),
       linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
     background-size: 40px 40px;
@@ -122,29 +172,19 @@
 }
 
 @keyframes glitch {
-  0%, 90%, 100% {
-    transform: translate(0);
-  }
-  92% {
-    transform: translate(-2px, 1px);
-  }
-  94% {
-    transform: translate(2px, -1px);
-  }
-  96% {
-    transform: translate(-1px, 2px);
-  }
-  98% {
-    transform: translate(1px, -2px);
-  }
+  0%, 90%, 100% { transform: translate(0); }
+  92% { transform: translate(-2px, 1px); }
+  94% { transform: translate(2px, -1px); }
+  96% { transform: translate(-1px, 2px); }
+  98% { transform: translate(1px, -2px); }
 }
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 5px hsl(280 80% 60%), 0 0 10px hsl(280 80% 60%);
+    box-shadow: 0 0 5px hsl(var(--accent-hue) 80% 60%), 0 0 10px hsl(var(--accent-hue) 80% 60%);
   }
   50% {
-    box-shadow: 0 0 10px hsl(280 80% 60%), 0 0 20px hsl(280 80% 60%), 0 0 30px hsl(280 80% 60%);
+    box-shadow: 0 0 10px hsl(var(--accent-hue) 80% 60%), 0 0 20px hsl(var(--accent-hue) 80% 60%), 0 0 30px hsl(var(--accent-hue) 80% 60%);
   }
 }
 
@@ -159,23 +199,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(260 20% 8%);
+  background: hsl(var(--background));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(280 40% 25%);
+  background: hsl(var(--border));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(280 80% 60%);
+  background: hsl(var(--accent-hue) 80% 60%);
 }
 
 /* ========================================
    2000s WEB STYLES - FOR THE BLOG
    ======================================== */
 
-/* Marquee animation */
 @keyframes marquee {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
@@ -190,7 +229,6 @@
   animation: marquee 25s linear infinite;
 }
 
-/* Blinking text */
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
@@ -200,15 +238,14 @@
   animation: blink 1s step-end infinite;
 }
 
-/* Rainbow text */
 @keyframes rainbow {
-  0% { color: #ff0000; }
-  14% { color: #ff7f00; }
-  28% { color: #ffff00; }
-  42% { color: #00ff00; }
-  57% { color: #0000ff; }
-  71% { color: #8b00ff; }
-  85% { color: #ff00ff; }
+  0%   { color: #ff0000; }
+  14%  { color: #ff7f00; }
+  28%  { color: #ffff00; }
+  42%  { color: #00ff00; }
+  57%  { color: #0000ff; }
+  71%  { color: #8b00ff; }
+  85%  { color: #ff00ff; }
   100% { color: #ff0000; }
 }
 
@@ -216,30 +253,27 @@
   animation: rainbow 3s linear infinite;
 }
 
-/* Spinning element */
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .spin-slow {
   animation: spin-slow 8s linear infinite;
 }
 
-/* Bouncing */
 @keyframes bounce-retro {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50%       { transform: translateY(-10px); }
 }
 
 .bounce-retro {
   animation: bounce-retro 0.5s ease-in-out infinite;
 }
 
-/* Starfield background */
 @keyframes twinkle {
   0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+  50%       { opacity: 1; }
 }
 
 .star {
@@ -251,7 +285,6 @@
   animation: twinkle 2s ease-in-out infinite;
 }
 
-/* Beveled 2000s button */
 .btn-2000s {
   background: linear-gradient(180deg, #d0d0d0 0%, #a0a0a0 50%, #808080 51%, #909090 100%);
   border: 2px outset #c0c0c0;
@@ -265,7 +298,6 @@
   border-style: inset;
 }
 
-/* Neon purple button */
 .btn-neon {
   background: linear-gradient(180deg, hsl(280 80% 70%) 0%, hsl(280 80% 50%) 100%);
   border: 3px outset hsl(280 80% 60%);
@@ -274,7 +306,6 @@
   text-shadow: 0 0 5px white;
 }
 
-/* Tiled background patterns */
 .tiled-stars {
   background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='5' y='15' font-size='12'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E");
   background-repeat: repeat;
@@ -285,38 +316,28 @@
   background-repeat: repeat;
 }
 
-/* Retro border styles */
-.border-groove {
-  border: 4px groove hsl(280 60% 50%);
-}
-
-.border-ridge {
-  border: 4px ridge hsl(280 60% 50%);
-}
-
+.border-groove       { border: 4px groove hsl(280 60% 50%); }
+.border-ridge        { border: 4px ridge hsl(280 60% 50%); }
 .border-double-retro {
   border: 4px double hsl(280 80% 60%);
   box-shadow: inset 0 0 0 2px hsl(280 40% 30%);
 }
 
-/* Guestbook style box */
 .retro-box {
   background: linear-gradient(135deg, hsl(260 30% 12%) 0%, hsl(280 30% 8%) 100%);
   border: 3px ridge hsl(280 50% 40%);
-  box-shadow: 
+  box-shadow:
     inset 2px 2px 4px hsl(280 30% 20%),
     inset -2px -2px 4px hsl(280 30% 5%),
     4px 4px 0 hsl(260 20% 5%);
 }
 
-/* Web ring style nav */
 .webring-nav {
   background: linear-gradient(90deg, hsl(280 60% 30%) 0%, hsl(300 60% 40%) 50%, hsl(280 60% 30%) 100%);
   border: 2px solid hsl(280 80% 60%);
   padding: 8px;
 }
 
-/* Under construction stripes */
 .under-construction {
   background: repeating-linear-gradient(
     45deg,
@@ -327,9 +348,8 @@
   );
 }
 
-/* Scrolling text ticker */
 @keyframes ticker {
-  0% { transform: translateX(0); }
+  0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
@@ -337,14 +357,12 @@
   animation: ticker 20s linear infinite;
 }
 
-/* Glow hover effect */
 .hover-glow:hover {
-  filter: drop-shadow(0 0 8px hsl(280 80% 60%)) drop-shadow(0 0 15px hsl(280 80% 60%));
+  filter: drop-shadow(0 0 8px hsl(var(--accent-hue) 80% 60%)) drop-shadow(0 0 15px hsl(var(--accent-hue) 80% 60%));
 }
 
-/* Pixelated border (for that retro feel) */
 .pixel-border {
-  box-shadow: 
+  box-shadow:
     0 -4px 0 0 hsl(280 80% 60%),
     0 4px 0 0 hsl(280 80% 60%),
     -4px 0 0 0 hsl(280 80% 60%),
@@ -355,7 +373,6 @@
     4px 4px 0 0 hsl(280 60% 40%);
 }
 
-/* Visitor counter style */
 .visitor-counter {
   font-family: 'Courier New', monospace;
   background: black;
@@ -365,7 +382,6 @@
   letter-spacing: 2px;
 }
 
-/* Category badges */
 .category-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -375,10 +391,11 @@
   border: 2px outset;
 }
 
-.category-tech { background: hsl(180 70% 40%); border-color: hsl(180 70% 50%); color: white; }
-.category-gaming { background: hsl(280 70% 50%); border-color: hsl(280 70% 60%); color: white; }
-.category-books { background: hsl(40 70% 40%); border-color: hsl(40 70% 50%); color: white; }
-.category-life { background: hsl(320 70% 50%); border-color: hsl(320 70% 60%); color: white; }
+.category-tech    { background: hsl(180 70% 40%); border-color: hsl(180 70% 50%); color: white; }
+.category-gaming  { background: hsl(280 70% 50%); border-color: hsl(280 70% 60%); color: white; }
+.category-books   { background: hsl(40 70% 40%);  border-color: hsl(40 70% 50%);  color: white; }
+.category-life    { background: hsl(320 70% 50%); border-color: hsl(320 70% 60%); color: white; }
+.category-hiking  { background: hsl(120 50% 40%); border-color: hsl(120 50% 50%); color: white; }
 
 /* Blog post content: highlighted uploaded files */
 .blog-content .file-download-link {
@@ -396,10 +413,10 @@
   transition: all 0.2s;
   box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
 }
+
 .blog-content .file-download-link:hover {
   background: rgba(126, 34, 206, 0.6);
   border-color: rgb(217, 70, 239);
   color: white;
   box-shadow: 0 0 14px rgba(217, 70, 239, 0.5);
 }
-.category-hiking { background: hsl(120 50% 40%); border-color: hsl(120 50% 50%); color: white; }
